@@ -98,7 +98,6 @@ func ScanFirstAndLastDigitLiterals(data []byte, atEOF bool) (advance int, token 
 		r, width = utf8.DecodeRune(line[i:])
 		if isDigitLiteral(r) {
 			token = utf8.AppendRune(token, r)
-			// return i + width, data[i : i+width], nil
 		}
 	}
 
