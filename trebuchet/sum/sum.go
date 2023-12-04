@@ -101,22 +101,11 @@ func ScanFirstAndLastDigitLiterals(data []byte, atEOF bool) (advance int, token 
 		}
 	}
 
-	// Compute the number from the literals.
-	tokenCount := utf8.RuneCount(token)
-	if tokenCount == 0 {
+	token = concatFirstAndLastTokens(token)
+	if token == nil {
 		// Request more data.
 		return 0, nil, nil
 	}
-
-	first, firstWidth := utf8.DecodeRune(token)
-	if tokenCount == 1 {
-		token = utf8.AppendRune(token, first)
-		return lineLen, token, nil
-	}
-
-	// Take the first and last digits and concatenate them.
-	_, lastWidth := utf8.DecodeLastRune(token)
-	token = append(token[:firstWidth], token[len(token)-lastWidth:]...)
 	return lineLen, token, nil
 }
 
@@ -127,4 +116,24 @@ func isDigitLiteral(r rune) bool {
 	case '0', '1', '2', '3', '4', '5', '6', '7', '8', '9':
 		return true
 	}
+}
+
+func concatFirstAndLastTokens(tokens []byte) []byte {
+	// Compute the number from the literals.
+	tokenCount := utf8.RuneCount(tokens)
+	if tokenCount == 0 {
+		// Request more data.
+		return nil
+	}
+
+	first, firstWidth := utf8.DecodeRune(tokens)
+	if tokenCount == 1 {
+		tokens = utf8.AppendRune(tokens, first)
+		return tokens
+	}
+
+	// Take the first and last digits and concatenate them.
+	_, lastWidth := utf8.DecodeLastRune(tokens)
+	tokens = append(tokens[:firstWidth], tokens[len(tokens)-lastWidth:]...)
+	return tokens
 }
