@@ -96,7 +96,7 @@ func ScanFirstAndLastDigitLiterals(data []byte, atEOF bool) (advance int, token 
 	for i, width := 0, 0; i < len(line); i += width {
 		var r rune
 		r, width = utf8.DecodeRune(line[i:])
-		if isDigitLiteral(r) {
+		if r >= '0' && r <= '9' {
 			token = utf8.AppendRune(token, r)
 		}
 	}
@@ -107,15 +107,6 @@ func ScanFirstAndLastDigitLiterals(data []byte, atEOF bool) (advance int, token 
 		return 0, nil, nil
 	}
 	return lineLen, token, nil
-}
-
-func isDigitLiteral(r rune) bool {
-	switch r {
-	default:
-		return false
-	case '0', '1', '2', '3', '4', '5', '6', '7', '8', '9':
-		return true
-	}
 }
 
 func concatFirstAndLastTokens(tokens []byte) []byte {
